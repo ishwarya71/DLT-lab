@@ -1,0 +1,36 @@
+import numpy as np
+from sklearn.datasets import load_breast_cancer from sklearn.model_selection import train_test_split from sklearn.metrics import accuracy_score
+
+def sigmoid(z):
+return 1 / (1 + np.exp(-z))
+
+
+def compute_cost(y, y_pred):
+m = y.shape[0]
+return -np.sum(y * np.log(y_pred + 1e-9) + (1 - y) * np.log(1 - y_pred + 1e-9)) / m data = load_breast_cancer()
+
+X = data.data
+y = data.target.reshape(-1, 1)
+X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=42
+)
+n_features = X_train.shape[1] weights = np.zeros((n_features, 1)) bias = 0
+learning_rate = 0.000001
+epochs = 15
+m = X_train.shape[0]
+
+
+for epoch in range(1, epochs + 1):
+z = np.dot(X_train, weights) + bias y_pred = sigmoid(z)
+cost = compute_cost(y_train, y_pred)
+ 
+dw = np.dot(X_train.T, (y_pred - y_train)) / m db = np.sum(y_pred - y_train) / m
+
+weights -= learning_rate * dw bias -= learning_rate * db
+print(f"Iteration: {epoch}	Cost: {cost:.6f}")
+
+
+z_test = np.dot(X_test, weights) + bias y_test_pred = sigmoid(z_test)
+y_test_labels = (y_test_pred >= 0.5).astype(int)
+
+
+accuracy = accuracy_score(y_test, y_test_labels) print(f"\nModel Accuracy on Test Set: {accuracy * 100:.2f}%")
